@@ -1,0 +1,18 @@
+rules_version = '2';
+
+// Baseline Firestore Security Rules untuk aplikasi internal bengkel.
+// Rules ini mengizinkan akses hanya untuk pengguna yang sudah terautentikasi.
+//
+// CATATAN: Rules ini bersifat sementara dan akan diperketat setelah
+// desain collection dan struktur role/permission selesai dirancang.
+// Pastikan rules ini sudah di-deploy ke Firebase sebelum production.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+  }
+}
