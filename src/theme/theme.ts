@@ -1,3 +1,4 @@
+import React from 'react';
 import { createTheme, alpha } from '@mui/material/styles';
 
 // ─── Design Token Palette ────────────────────────────────────────────────────
@@ -237,6 +238,14 @@ const theme = createTheme({
     },
 
     // ── TextField / Input ────────────────────────────────────────────────────
+    // Select-all on focus for all text inputs
+    MuiInputBase: {
+      defaultProps: {
+        onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+          e.target.select();
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
@@ -248,14 +257,6 @@ const theme = createTheme({
           },
           '&:hover .MuiOutlinedInput-notchedOutline': {
             borderColor: colors.charcoal,
-          },
-          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: colors.ink,
-            borderWidth: 2,
-          },
-          '&.Mui-focused': {
-            outline: `4px solid ${colors.focusOuter}`,
-            outlineOffset: 0,
           },
         },
         input: {
@@ -271,7 +272,6 @@ const theme = createTheme({
         root: {
           color: colors.mute,
           fontSize: '1rem',
-          '&.Mui-focused': { color: colors.ink },
         },
       },
     },

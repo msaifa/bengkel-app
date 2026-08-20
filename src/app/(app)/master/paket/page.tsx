@@ -9,6 +9,7 @@ import { fetchAllPaket, createPaketService, updatePaketService, setPaketActiveSe
 import { fetchAllBarang } from '@/services/barang.service';
 import { fetchAllJasa } from '@/services/jasa.service';
 import { useAuth } from '@/hooks/useAuth';
+import { generateKode } from '@/utils/kode';
 import PaketForm from '@/components/master/paket/PaketForm';
 import PaketList from '@/components/master/paket/PaketList';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -27,6 +28,7 @@ export default function MasterPaketPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('aktif');
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Paket | null>(null);
+  const [autoKode, setAutoKode] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<Paket | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -58,8 +60,13 @@ export default function MasterPaketPage() {
     });
   }, [items, search, statusFilter]);
 
-  function openCreate() { setEditTarget(null); setFormOpen(true); }
-  function openEdit(item: Paket) { setEditTarget(item); setFormOpen(true); }
+  function openCreate() {
+    const kode = generateKode('P', items.map((i) => i.kode));
+    setAutoKode(kode);
+    setEditTarget(null);
+    setFormOpen(true);
+  }
+  function openEdit(item: Paket) { setAutoKode(''); setEditTarget(item); setFormOpen(true); }
 
   async function handleFormSubmit(data: PaketFormData) {
     if (!user) return;
@@ -125,7 +132,7 @@ export default function MasterPaketPage() {
         <PaketList items={filtered} loading={loading} barangList={barangList} jasaList={jasaList} onEdit={openEdit} onToggleActive={openConfirm} onAdd={openCreate} />
       </Box>
 
-      <PaketForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} barangList={barangList} jasaList={jasaList} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
+      <PaketForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} autoKode={autoKode} barangList={barangList} jasaList={jasaList} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
       <ConfirmDialog open={confirmOpen}
         title={confirmTarget?.isActive ? 'Nonaktifkan Paket?' : 'Aktifkan Paket?'}
         description={confirmTarget?.isActive ? `Paket "${confirmTarget?.nama}" tidak akan muncul pada pilihan transaksi baru.` : `Paket "${confirmTarget?.nama}" akan aktif kembali.`}

@@ -29,10 +29,18 @@ export const BOTTOM_NAV_HEIGHT = 64;
 const FLOAT_MARGIN_X = 16;
 const FLOAT_MARGIN_BOTTOM = 16;
 
+// Routes where the bottom nav should be hidden (form/detail pages)
+const HIDDEN_PATHS = ['/transaksi/tambah', '/barang-masuk/tambah'];
+
 export default function MobileBottomNavigation() {
   const theme = useTheme();
   const pathname = usePathname();
   const router = useRouter();
+
+  // Hide on form pages
+  if (HIDDEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+    return null;
+  }
 
   const activeIndex = getBottomNavValue(pathname);
 

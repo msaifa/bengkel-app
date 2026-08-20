@@ -14,12 +14,14 @@ import {
   useTheme,
 } from '@mui/material';
 import { Barang, BarangFormData } from '@/types/master';
+import CurrencyInput from '@/components/common/CurrencyInput';
 
 const SATUAN_OPTIONS = ['pcs', 'botol', 'liter', 'set', 'unit', 'kg', 'meter', 'lembar'];
 
 interface BarangFormProps {
   open: boolean;
   editData?: Barang | null;
+  autoKode?: string;
   onClose: () => void;
   onSubmit: (data: BarangFormData) => Promise<void>;
 }
@@ -35,15 +37,16 @@ const EMPTY: BarangFormData = {
   isActive: true,
 };
 
-export default function BarangForm({ open, editData, onClose, onSubmit }: BarangFormProps) {
+export default function BarangForm({ open, editData, autoKode, onClose, onSubmit }: BarangFormProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [form, setForm] = useState<BarangFormData>(() =>
     editData
       ? { kode: editData.kode, nama: editData.nama, kategori: editData.kategori, satuan: editData.satuan, hargaBeli: editData.hargaBeli, hargaJual: editData.hargaJual, stokMinimum: editData.stokMinimum, isActive: editData.isActive }
-      : EMPTY,
+      : { ...EMPTY, kode: autoKode ?? '' },
   );
+  const isAutoKode = !editData; // kode readonly saat mode tambah
   const [errors, setErrors] = useState<Partial<Record<keyof BarangFormData, string>>>({});
   const [saving, setSaving] = useState(false);
 
@@ -93,13 +96,13 @@ export default function BarangForm({ open, editData, onClose, onSubmit }: Barang
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              label="Kode *"
+              label="Kode"
               value={form.kode}
               onChange={(e) => set('kode', e.target.value)}
               fullWidth
               error={!!errors.kode}
-              helperText={errors.kode}
-              slotProps={{ htmlInput: { style: { textTransform: 'uppercase' } } }}
+              helperText={errors.kode ?? (isAutoKode ? 'Terisi otomatis, bisa diubah' : undefined)}
+              slotProps={{ htmlInput: { style: { textTransform: 'uppercase', fontFamily: 'monospace', letterSpacing: 1 } } }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -137,25 +140,21 @@ export default function BarangForm({ open, editData, onClose, onSubmit }: Barang
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Harga Beli (Rp) *"
-              type="number"
+            <CurrencyInput
+              label="Harga Beli *"
               value={form.hargaBeli}
-              onChange={(e) => set('hargaBeli', Number(e.target.value))}
+              onChange={(v) => set('hargaBeli', v)}
               fullWidth
-              slotProps={{ htmlInput: { min: 0 } }}
               error={!!errors.hargaBeli}
               helperText={errors.hargaBeli}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Harga Jual (Rp) *"
-              type="number"
+            <CurrencyInput
+              label="Harga Jual *"
               value={form.hargaJual}
-              onChange={(e) => set('hargaJual', Number(e.target.value))}
+              onChange={(v) => set('hargaJual', v)}
               fullWidth
-              slotProps={{ htmlInput: { min: 0 } }}
               error={!!errors.hargaJual}
               helperText={errors.hargaJual}
             />

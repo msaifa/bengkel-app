@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Barang, BarangFormData } from '@/types/master';
 import { fetchAllBarang, createBarangService, updateBarangService, setBarangActiveService, DuplicateKodeError } from '@/services/barang.service';
 import { useAuth } from '@/hooks/useAuth';
+import { generateKode } from '@/utils/kode';
 import BarangForm from '@/components/master/barang/BarangForm';
 import BarangList from '@/components/master/barang/BarangList';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -23,6 +24,7 @@ export default function MasterBarangPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('aktif');
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Barang | null>(null);
+  const [autoKode, setAutoKode] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<Barang | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -54,8 +56,13 @@ export default function MasterBarangPage() {
     });
   }, [items, search, statusFilter]);
 
-  function openCreate() { setEditTarget(null); setFormOpen(true); }
-  function openEdit(item: Barang) { setEditTarget(item); setFormOpen(true); }
+  function openCreate() {
+    const kode = generateKode('B', items.map((i) => i.kode));
+    setAutoKode(kode);
+    setEditTarget(null);
+    setFormOpen(true);
+  }
+  function openEdit(item: Barang) { setAutoKode(''); setEditTarget(item); setFormOpen(true); }
 
   async function handleFormSubmit(data: BarangFormData) {
     if (!user) return;
@@ -121,7 +128,7 @@ export default function MasterBarangPage() {
         <BarangList items={filtered} loading={loading} onEdit={openEdit} onToggleActive={openConfirm} onAdd={openCreate} />
       </Box>
 
-      <BarangForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
+      <BarangForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} autoKode={autoKode} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
       <ConfirmDialog open={confirmOpen}
         title={confirmTarget?.isActive ? 'Nonaktifkan Barang?' : 'Aktifkan Barang?'}
         description={confirmTarget?.isActive ? `Barang "${confirmTarget?.nama}" tidak akan muncul pada pilihan transaksi baru. Data lama tidak akan dihapus.` : `Barang "${confirmTarget?.nama}" akan aktif kembali dan dapat digunakan pada transaksi.`}

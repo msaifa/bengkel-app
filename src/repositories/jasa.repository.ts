@@ -1,106 +1,93 @@
 import {
-  collection,
-  doc,
-  getDocs,
-  addDoc,
-  updateDoc,
-  query,
-  where,
-  serverTimestamp,
-  QueryDocumentSnapshot,
-  DocumentData,
-} from 'firebase/firestore';
-import { db } from '@/lib/firebase/firestore';
+  ref, get, push, update, query, orderByChild, equalTo,
+} from 'firebase/database';
+import { db } from '@/lib/firebase/database';
 import { Jasa, JasaFormData } from '@/types/master';
 import { normalizeKode } from '@/utils/normalize';
 
-const COLLECTION = 'jasa';
+const NODE = 'jasa';
 
-function toJasa(snap: QueryDocumentSnapshot<DocumentData>): Jasa {
-  const d = snap.data();
+function getRef() {
+  if (!db) throw new Error('Realtime Database belum dikonfigurasi.');
+  return ref(db, NODE);
+}
+
+function toJasa(id: string, d: Record<string, unknown>): Jasa {
   return {
-    id: snap.id,
-    kode: d.kode,
-    kodeNormalized: d.kodeNormalized,
-    nama: d.nama,
-    kategori: d.kategori ?? '',
-    harga: d.harga,
-    estimasiMenit: d.estimasiMenit ?? null,
-    deskripsi: d.deskripsi ?? '',
-    isActive: d.isActive ?? true,
-    createdAt: d.createdAt,
-    updatedAt: d.updatedAt,
-    createdBy: d.createdBy,
-    updatedBy: d.updatedBy,
+    id,
+    kode: d.kode as string,
+    kodeNormalized: d.kodeNormalized as string,
+    nama: d.nama as string,
+    kategori: (d.kategori as string) ?? '',
+    harga: d.harga as number,
+    estimasiMenit: (d.estimasiMenit as number | null) ?? null,
+    deskripsi: (d.deskripsi as string) ?? '',
+    isActive: (d.isActive as boolean) ?? true,
+    createdAt: d.createdAt as number,
+    updatedAt: d.updatedAt as number,
+    createdBy: d.createdBy as string,
+    updatedBy: d.updatedBy as string,
   };
 }
 
-function getCollection() {
-  if (!db) throw new Error('Firestore belum dikonfigurasi.');
-  return collection(db, COLLECTION);
-}
-
 export async function getAllJasa(): Promise<Jasa[]> {
-  const snap = await getDocs(getCollection());
-  return snap.docs.map(toJasa);
+  const snap = await get(getRef());
+  if (!snap.exists()) return [];
+  const result: Jasa[] = [];
+  snap.forEach((child) => {
+    result.push(toJasa(child.key!, child.val() as Record<string, unknown>));
+  });
+  return result;
 }
 
-export async function findJasaByKode(
-  kodeNormalized: string,
-): Promise<Jasa | null> {
-  const q = query(getCollection(), where('kodeNormalized', '==', kodeNormalized));
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  return toJasa(snap.docs[0]);
+export async function findJasaByKode(kodeNormalized: string): Promise<Jasa | null> {
+  const q = query(getRef(), orderByChild('kodeNormalized'), equalTo(kodeNormalized));
+  const snap = await get(q);
+  if (!snap.exists()) return null;
+  let found: Jasa | null = null;
+  snap.forEach((child) => {
+    found = toJasa(child.key!, child.val() as Record<string, unknown>);
+  });
+  return found;
 }
 
-export async function createJasa(
-  data: JasaFormData,
-  uid: string,
-): Promise<string> {
-  const col = getCollection();
-  const ref = await addDoc(col, {
+export async function createJasa(data: JasaFormData, uid: string): Promise<string> {
+  const nodeRef = getRef();
+  const newRef = push(nodeRef);
+  await update(newRef, {
     ...data,
     kode: data.kode.trim(),
     kodeNormalized: normalizeKode(data.kode),
     isActive: true,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
     createdBy: uid,
     updatedBy: uid,
   });
-  return ref.id;
+  return newRef.key!;
 }
 
-export async function updateJasa(
-  id: string,
-  data: Partial<JasaFormData>,
-  uid: string,
-): Promise<void> {
-  if (!db) throw new Error('Firestore belum dikonfigurasi.');
-  const ref = doc(db, COLLECTION, id);
+export async function updateJasa(id: string, data: Partial<JasaFormData>, uid: string): Promise<void> {
+  if (!db) throw new Error('Realtime Database belum dikonfigurasi.');
+  const nodeRef = ref(db, `${NODE}/${id}`);
   const payload: Record<string, unknown> = {
     ...data,
-    updatedAt: serverTimestamp(),
+    updatedAt: Date.now(),
     updatedBy: uid,
   };
   if (data.kode !== undefined) {
     payload.kode = data.kode.trim();
     payload.kodeNormalized = normalizeKode(data.kode);
   }
-  await updateDoc(ref, payload);
+  await update(nodeRef, payload);
 }
 
-export async function setJasaActive(
-  id: string,
-  isActive: boolean,
-  uid: string,
-): Promise<void> {
-  if (!db) throw new Error('Firestore belum dikonfigurasi.');
-  const ref = doc(db, COLLECTION, id);
-  await updateDoc(ref, {
+export async function setJasaActive(id: string, isActive: boolean, uid: string): Promise<void> {
+  if (!db) throw new Error('Realtime Database belum dikonfigurasi.');
+  const nodeRef = ref(db, `${NODE}/${id}`);
+  await update(nodeRef, {
     isActive,
-    updatedAt: serverTimestamp(),
+    updatedAt: Date.now(),
     updatedBy: uid,
   });
 }

@@ -31,3 +31,27 @@ export function compactCurrency(value: number): string {
   }
   return `Rp ${value}`;
 }
+
+/**
+ * Format Unix timestamp (ms) to Indonesian date string.
+ * @example formatDate(1724025600000) → "19 Agustus 2026"
+ */
+export function formatDate(ts: number): string {
+  return new Intl.DateTimeFormat('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(ts));
+}
+
+/**
+ * Format Unix timestamp (ms) to short date.
+ * @example formatDateShort(1724025600000) → "19/08/2026"
+ */
+export function formatDateShort(ts: number): string {
+  return new Intl.DateTimeFormat('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(new Date(ts));
+}

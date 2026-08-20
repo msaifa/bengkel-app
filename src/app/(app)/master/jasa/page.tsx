@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Jasa, JasaFormData } from '@/types/master';
 import { fetchAllJasa, createJasaService, updateJasaService, setJasaActiveService, DuplicateKodeError } from '@/services/jasa.service';
 import { useAuth } from '@/hooks/useAuth';
+import { generateKode } from '@/utils/kode';
 import JasaForm from '@/components/master/jasa/JasaForm';
 import JasaList from '@/components/master/jasa/JasaList';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
@@ -23,6 +24,7 @@ export default function MasterJasaPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('aktif');
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<Jasa | null>(null);
+  const [autoKode, setAutoKode] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmTarget, setConfirmTarget] = useState<Jasa | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -54,8 +56,13 @@ export default function MasterJasaPage() {
     });
   }, [items, search, statusFilter]);
 
-  function openCreate() { setEditTarget(null); setFormOpen(true); }
-  function openEdit(item: Jasa) { setEditTarget(item); setFormOpen(true); }
+  function openCreate() {
+    const kode = generateKode('J', items.map((i) => i.kode));
+    setAutoKode(kode);
+    setEditTarget(null);
+    setFormOpen(true);
+  }
+  function openEdit(item: Jasa) { setAutoKode(''); setEditTarget(item); setFormOpen(true); }
 
   async function handleFormSubmit(data: JasaFormData) {
     if (!user) return;
@@ -121,7 +128,7 @@ export default function MasterJasaPage() {
         <JasaList items={filtered} loading={loading} onEdit={openEdit} onToggleActive={openConfirm} onAdd={openCreate} />
       </Box>
 
-      <JasaForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
+      <JasaForm key={`${formOpen}-${editTarget?.id ?? 'new'}`} open={formOpen} editData={editTarget} autoKode={autoKode} onClose={() => setFormOpen(false)} onSubmit={handleFormSubmit} />
       <ConfirmDialog open={confirmOpen}
         title={confirmTarget?.isActive ? 'Nonaktifkan Jasa?' : 'Aktifkan Jasa?'}
         description={confirmTarget?.isActive ? `Jasa "${confirmTarget?.nama}" tidak akan muncul pada pilihan transaksi baru.` : `Jasa "${confirmTarget?.nama}" akan aktif kembali.`}

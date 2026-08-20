@@ -1,0 +1,18 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "barang": {
+      ".indexOn": ["kodeNormalized"]
+    },
+    "jasa": {
+      ".indexOn": ["kodeNormalized"]
+    },
+    "paket": {
+      ".indexOn": ["kodeNormalized"]
+    },
+    "stockMovements": {
+      ".indexOn": ["occurredAt", "barangId"]
+    }
+  }
+}

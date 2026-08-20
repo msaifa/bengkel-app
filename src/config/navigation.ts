@@ -59,7 +59,7 @@ export function isAkunActive(pathname: string): boolean {
  */
 export function getBottomNavValue(pathname: string): number {
   if (pathname === '/') return 0;
-  if (pathname.startsWith('/barang-masuk')) return 1;
+  if (pathname.startsWith('/barang-masuk') || pathname.startsWith('/stok')) return 1;
   if (pathname.startsWith('/transaksi')) return 2;
   if (pathname.startsWith('/laporan')) return 3;
   if (isAkunActive(pathname)) return 4;

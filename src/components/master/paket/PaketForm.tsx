@@ -23,10 +23,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Barang, Jasa, Paket, PaketFormData, PaketKomponen } from '@/types/master';
 import { formatCurrency } from '@/utils/format';
+import CurrencyInput from '@/components/common/CurrencyInput';
 
 interface PaketFormProps {
   open: boolean;
   editData?: Paket | null;
+  autoKode?: string;
   barangList: Barang[];
   jasaList: Jasa[];
   onClose: () => void;
@@ -62,6 +64,7 @@ function calcHargaNormal(
 export default function PaketForm({
   open,
   editData,
+  autoKode,
   barangList,
   jasaList,
   onClose,
@@ -73,8 +76,9 @@ export default function PaketForm({
   const [form, setForm] = useState<PaketFormData>(() =>
     editData
       ? { kode: editData.kode, nama: editData.nama, deskripsi: editData.deskripsi, komponen: editData.komponen.map((k) => ({ ...k })), hargaPaket: editData.hargaPaket, isActive: editData.isActive }
-      : EMPTY,
+      : { ...EMPTY, kode: autoKode ?? '' },
   );
+  const isAutoKode = !editData;
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
@@ -185,13 +189,13 @@ export default function PaketForm({
           {/* Basic info */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              label="Kode *"
+              label="Kode"
               value={form.kode}
               onChange={(e) => setField('kode', e.target.value)}
               fullWidth
               error={!!errors.kode}
-              helperText={errors.kode}
-              slotProps={{ htmlInput: { style: { textTransform: 'uppercase' } } }}
+              helperText={errors.kode ?? (isAutoKode ? 'Terisi otomatis, bisa diubah' : undefined)}
+              slotProps={{ htmlInput: { style: { textTransform: 'uppercase', fontFamily: 'monospace', letterSpacing: 1 } } }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
@@ -368,13 +372,11 @@ export default function PaketForm({
           )}
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Harga Paket (Rp) *"
-              type="number"
+            <CurrencyInput
+              label="Harga Paket *"
               value={form.hargaPaket}
-              onChange={(e) => setField('hargaPaket', Number(e.target.value))}
+              onChange={(v) => setField('hargaPaket', v)}
               fullWidth
-              slotProps={{ htmlInput: { min: 0 } }}
               error={!!errors.hargaPaket}
               helperText={errors.hargaPaket ?? 'Harga yang ditawarkan kepada pelanggan'}
             />

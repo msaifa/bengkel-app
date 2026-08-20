@@ -70,15 +70,6 @@ export default function AkunPage() {
 
   return (
     <Box sx={{ maxWidth: 560, mx: 'auto' }}>
-      {/* ── Page header ─────────────────────────────────────────────────── */}
-      <Box className="page-header">
-        <Typography component="h1" className="page-title">
-          Akun
-        </Typography>
-        <Typography className="page-subtitle">
-          Informasi akun dan pengaturan aplikasi.
-        </Typography>
-      </Box>
 
       {/* ── Account summary card ─────────────────────────────────────────── */}
       <Box

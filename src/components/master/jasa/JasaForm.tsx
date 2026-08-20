@@ -13,10 +13,12 @@ import {
   useTheme,
 } from '@mui/material';
 import { Jasa, JasaFormData } from '@/types/master';
+import CurrencyInput from '@/components/common/CurrencyInput';
 
 interface JasaFormProps {
   open: boolean;
   editData?: Jasa | null;
+  autoKode?: string;
   onClose: () => void;
   onSubmit: (data: JasaFormData) => Promise<void>;
 }
@@ -31,15 +33,16 @@ const EMPTY: JasaFormData = {
   isActive: true,
 };
 
-export default function JasaForm({ open, editData, onClose, onSubmit }: JasaFormProps) {
+export default function JasaForm({ open, editData, autoKode, onClose, onSubmit }: JasaFormProps) {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const [form, setForm] = useState<JasaFormData>(() =>
     editData
       ? { kode: editData.kode, nama: editData.nama, kategori: editData.kategori, harga: editData.harga, estimasiMenit: editData.estimasiMenit, deskripsi: editData.deskripsi, isActive: editData.isActive }
-      : EMPTY,
+      : { ...EMPTY, kode: autoKode ?? '' },
   );
+  const isAutoKode = !editData;
   const [errors, setErrors] = useState<Partial<Record<keyof JasaFormData, string>>>({});
   const [saving, setSaving] = useState(false);
 
@@ -92,23 +95,21 @@ export default function JasaForm({ open, editData, onClose, onSubmit }: JasaForm
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
-              label="Kode *"
+              label="Kode"
               value={form.kode}
               onChange={(e) => set('kode', e.target.value)}
               fullWidth
               error={!!errors.kode}
-              helperText={errors.kode}
-              slotProps={{ htmlInput: { style: { textTransform: 'uppercase' } } }}
+              helperText={errors.kode ?? (isAutoKode ? 'Terisi otomatis, bisa diubah' : undefined)}
+              slotProps={{ htmlInput: { style: { textTransform: 'uppercase', fontFamily: 'monospace', letterSpacing: 1 } } }}
             />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              label="Harga (Rp) *"
-              type="number"
+            <CurrencyInput
+              label="Harga *"
               value={form.harga}
-              onChange={(e) => set('harga', Number(e.target.value))}
+              onChange={(v) => set('harga', v)}
               fullWidth
-              slotProps={{ htmlInput: { min: 0 } }}
               error={!!errors.harga}
               helperText={errors.harga}
             />
