@@ -38,7 +38,9 @@ src/
 │   │   ├── page.tsx              # Dashboard (/)
 │   │   ├── akun/page.tsx         # Akun & navigasi ke master
 │   │   ├── laporan/page.tsx      # Laporan (placeholder)
-│   │   ├── uang-keluar/page.tsx  # Uang Keluar (placeholder)
+│   │   ├── uang-keluar/
+│   │   │   ├── page.tsx          # List Uang Keluar + FAB + Dialog form tambah
+│   │   │   └── [id]/page.tsx     # Detail + batalkan Pengeluaran
 │   │   ├── master/
 │   │   │   ├── barang/page.tsx   # CRUD Barang
 │   │   │   ├── jasa/page.tsx     # CRUD Jasa
@@ -86,6 +88,11 @@ src/
 │       ├── TransaksiForm.tsx     # Form transaksi — full-screen, fixed footer, collapsible info
 │       ├── TransaksiList.tsx
 │       └── TransaksiStatusChip.tsx
+├── components/uang-keluar/
+│   ├── UangKeluarDetail.tsx      # Detail + cancel dialog
+│   ├── UangKeluarForm.tsx        # Dialog form tambah pengeluaran (responsive fullScreen mobile)
+│   ├── UangKeluarList.tsx        # List desktop table + mobile cards, search, filter status/kategori
+│   └── UangKeluarStatusChip.tsx
 ├── config/
 │   └── navigation.ts             # mobilePrimaryNav, accountSecondaryNav, getBottomNavValue
 ├── contexts/AuthContext.tsx
@@ -101,19 +108,22 @@ src/
 │   ├── paket.repository.ts
 │   ├── pembelian.repository.ts
 │   ├── stockMovement.repository.ts
-│   └── transaksi.repository.ts
+│   ├── transaksi.repository.ts
+│   └── uangKeluar.repository.ts
 ├── services/                     # Business logic — validasi, kalkulasi, atomic write
 │   ├── barang.service.ts
 │   ├── inventory.service.ts      # fetchInventoryView(), fetchRecentMovements()
 │   ├── jasa.service.ts
 │   ├── paket.service.ts
 │   ├── pembelian.service.ts      # createPembelianService, cancelPembelianService
-│   └── transaksi.service.ts      # createTransaksiService, cancelTransaksiService, aggregateStockRequirements
+│   ├── transaksi.service.ts      # createTransaksiService, cancelTransaksiService, aggregateStockRequirements
+│   └── uangKeluar.service.ts     # createUangKeluarService, cancelUangKeluarService
 ├── theme/theme.ts
 ├── types/
 │   ├── master.ts                 # Barang, Jasa, Paket, PaketKomponen, AuditFields
 │   ├── pembelian.ts              # Pembelian, Inventory, StockMovement, InventoryView
-│   └── transaksi.ts             # Transaksi, TransactionItem, TransaksiFormData, StockRequirement
+│   ├── transaksi.ts             # Transaksi, TransactionItem, TransaksiFormData, StockRequirement
+│   └── uangKeluar.ts            # UangKeluar, UangKeluarStatus, MetodePembayaranPengeluaran, UangKeluarFormData, KATEGORI_PENGELUARAN
 └── utils/
     ├── format.ts                 # formatCurrency, compactCurrency, formatDate, formatDateShort
     ├── kode.ts                   # generateKode(prefix, existingCodes) → "B26081901"
@@ -153,7 +163,8 @@ Firebase Realtime Database
 ├── pembelian/
 ├── transaksi/
 ├── inventory/
-└── stockMovements/
+├── stockMovements/
+└── uangKeluar/
 ```
 
 ---
@@ -367,12 +378,45 @@ Keyed by `barangId` (bukan pushKey) — satu record per barang.
 
 ---
 
+### 4.8 `/uangKeluar/{pushKey}`
+
+```typescript
+{
+  id: string;                 // sama dengan pushKey
+  nomorPengeluaran: string;   // format: "UK-YYMMDD-XXXXXX" — immutable
+  tanggalPengeluaran: number; // Unix ms (dari input user)
+  kategori: string;           // predefined: Listrik, Air, Internet, Sewa, dll.
+  keterangan: string;         // required, trimmed
+  nominal: number;            // Rupiah, > 0
+  metodePembayaran: 'cash' | 'transfer' | 'qris';
+  penerima?: string;          // opsional — "PLN", "Pak Budi", dll.
+  nomorReferensi?: string;    // opsional — nomor nota/faktur
+  catatan?: string;           // opsional, multiline
+  status: 'posted' | 'cancelled';
+  createdAt: number;          // Unix ms
+  createdBy: string;          // Firebase Auth UID
+  updatedAt: number;
+  updatedBy: string;
+  cancelledAt?: number;
+  cancelledBy?: string;
+  cancellationReason?: string;
+}
+```
+
+**Catatan:**
+- Tidak mempengaruhi `/inventory` atau `/stockMovements`
+- Immutable setelah `posted` — tidak ada edit, hanya cancel
+- Double cancel dicegah di service level (load latest dari RTDB sebelum update)
+
+---
+
 ## 5. Nomor Dokumen
 
 | Dokumen | Format | Contoh |
 |---|---|---|
 | Pembelian | `PBL-YYMMDD-XXXXXX` | `PBL-260820-AB12CD` |
 | Transaksi | `TRX-YYMMDD-XXXXXX` | `TRX-260820-XY98ZW` |
+| Uang Keluar | `UK-YYMMDD-XXXXXX` | `UK-260820-AB12CD` |
 | Kode Barang | `{PREFIX}YYMMDDNN` | `OLI26082001` |
 | Kode Jasa | `{PREFIX}YYMMDDNN` | `SVC26082001` |
 | Kode Paket | `{PREFIX}YYMMDDNN` | `PKT26082001` |
@@ -470,9 +514,9 @@ NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://crud-firebase-3dcf6-default-rtdb.fireb
 | Pembelian (Barang Masuk) | ✅ | Create, detail, cancel + stock reversal |
 | Stok / Inventory | ✅ | View stok saat ini + riwayat pergerakan |
 | Transaksi Penjualan | ✅ | Create (cart+search+payment), detail, cancel + stock reversal |
+| Uang Keluar | ✅ | Create via dialog, detail, cancel (soft), search, filter status+kategori, FAB |
 | Dashboard | 🔲 | Placeholder |
 | Laporan | 🔲 | Placeholder (dilarang diimplementasi) |
-| Uang Keluar | 🔲 | Placeholder (dilarang diimplementasi) |
 | Master Supplier | 🔲 | Tidak diimplementasi |
 | Master Customer | 🔲 | Tidak diimplementasi |
 | Invoice PDF | 🔲 | Tidak diimplementasi |

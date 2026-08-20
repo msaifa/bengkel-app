@@ -241,8 +241,10 @@ const theme = createTheme({
     // Select-all on focus for all text inputs
     MuiInputBase: {
       defaultProps: {
-        onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-          e.target.select();
+        onFocus: (e: React.FocusEvent<HTMLElement>) => {
+          if (typeof (e.target as HTMLInputElement).select === 'function') {
+            (e.target as HTMLInputElement).select();
+          }
         },
       },
     },
