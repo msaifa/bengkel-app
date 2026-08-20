@@ -31,6 +31,7 @@ export default function AppHeader({ drawerWidth }: AppHeaderProps) {
       position="fixed"
       // AppBar overrides in theme: canvas bg, ink text, hairline border-bottom
       sx={{
+        display: { xs: 'none', md: 'flex' },
         width: { md: `calc(100% - ${drawerWidth}px)` },
         ml: { md: `${drawerWidth}px` },
       }}

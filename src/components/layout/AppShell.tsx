@@ -64,8 +64,8 @@ export default function AppShell({ children }: AppShellProps) {
               },
         }}
       >
-        {/* Spacer below fixed AppBar (64px) — only when header is visible */}
-        {!hideShell && <Toolbar sx={{ minHeight: 64 }} />}
+        {/* Spacer below fixed AppBar — only on desktop where header is visible */}
+        {!hideShell && <Toolbar sx={{ minHeight: 64, display: { xs: 'none', md: 'flex' } }} />}
         {children}
       </Box>
 
