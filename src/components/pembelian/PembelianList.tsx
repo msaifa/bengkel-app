@@ -13,6 +13,7 @@ import Menu from '@mui/material/Menu';
 import { Pembelian } from '@/types/pembelian';
 import { formatCurrency, formatDate } from '@/utils/format';
 import EmptyState from '@/components/common/EmptyState';
+import DateRangeFilter, { DateRange, isInDateRange, monthStartString, todayString } from '@/components/common/DateRangeFilter';
 import PembelianStatusChip from './PembelianStatusChip';
 
 interface Props {
@@ -28,17 +29,19 @@ export default function PembelianList({ items, loading, onAdd, onCancel }: Props
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('semua');
+  const [dateRange, setDateRange] = useState<DateRange>({ start: monthStartString(), end: todayString() });
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<Pembelian | null>(null);
 
   const filtered = items.filter((it) => {
     const q = search.toLowerCase();
     const matchFilter = filter === 'semua' || it.status === filter;
+    const matchPeriod = isInDateRange(it.tanggalPembelian, dateRange);
     const matchSearch = !q ||
       it.nomorPembelian.toLowerCase().includes(q) ||
       (it.supplierName ?? '').toLowerCase().includes(q) ||
       (it.nomorReferensi ?? '').toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+    return matchFilter && matchPeriod && matchSearch;
   });
 
   function openMenu(e: React.MouseEvent<HTMLElement>, item: Pembelian) {
@@ -56,15 +59,17 @@ export default function PembelianList({ items, loading, onAdd, onCancel }: Props
     <Box>
       {/* Search + Filter */}
       <Box sx={{ bgcolor: 'var(--color-canvas)', border: '1px solid var(--color-hairline)', borderRadius: 'var(--rounded-md)', mb: 2, overflow: 'hidden' }}>
-        <Box sx={{ px: 2, pt: 2 }}>
-          <TextField
-            placeholder="Cari nomor, supplier, nota..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            size="small" fullWidth
-            slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'var(--color-ash)' }} /></InputAdornment> } }}
-            sx={{ mb: 1.5 }}
-          />
+        <Box sx={{ px: 2, pt: 2, pb: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <TextField
+              placeholder="Cari nomor, supplier, nota..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              size="small" fullWidth
+              slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'var(--color-ash)' }} /></InputAdornment> } }}
+            />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </Box>
         </Box>
         <Tabs value={filter} onChange={(_, v) => setFilter(v as Filter)}
           sx={{ px: 2, minHeight: 40, '& .MuiTab-root': { minHeight: 40, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'none' }, '& .Mui-selected': { color: 'var(--color-primary)' }, '& .MuiTabs-indicator': { bgcolor: 'var(--color-primary)' } }}>

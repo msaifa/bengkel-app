@@ -10,17 +10,17 @@ import { alpha, useTheme } from '@mui/material/styles';
 import HomeIcon from '@mui/icons-material/Home';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import BarChartIcon from '@mui/icons-material/BarChart';
+import PaymentsIcon from '@mui/icons-material/Payments';
 import PersonIcon from '@mui/icons-material/Person';
 import { getBottomNavValue } from '@/config/navigation';
 
 // ─── Nav items — exactly 5 ───────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/',            icon: <HomeIcon /> },
+  { label: 'Dashboard', href: '/',             icon: <HomeIcon /> },
   { label: 'Pembelian', href: '/barang-masuk', icon: <ShoppingCartIcon /> },
-  { label: 'Transaksi', href: '/transaksi',   icon: <ReceiptLongIcon /> },
-  { label: 'Report',    href: '/laporan',     icon: <BarChartIcon /> },
-  { label: 'Akun',      href: '/akun',        icon: <PersonIcon /> },
+  { label: 'Transaksi', href: '/transaksi',    icon: <ReceiptLongIcon /> },
+  { label: 'Pengeluaran', href: '/uang-keluar', icon: <PaymentsIcon /> },
+  { label: 'Akun',      href: '/akun',         icon: <PersonIcon /> },
 ] as const;
 
 // Height of the floating bar itself (px) — used for bottom padding in AppShell

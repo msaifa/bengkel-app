@@ -13,6 +13,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Transaksi } from '@/types/transaksi';
 import { formatCurrency, formatDate } from '@/utils/format';
 import EmptyState from '@/components/common/EmptyState';
+import DateRangeFilter, { DateRange, isInDateRange, todayString } from '@/components/common/DateRangeFilter';
 import TransaksiStatusChip from './TransaksiStatusChip';
 
 interface Props {
@@ -30,16 +31,18 @@ export default function TransaksiList({ items, loading, onAdd, onCancel }: Props
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('semua');
+  const [dateRange, setDateRange] = useState<DateRange>({ start: todayString(), end: todayString() });
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [menuTarget, setMenuTarget] = useState<Transaksi | null>(null);
 
   const filtered = items.filter((it) => {
     const q = search.toLowerCase();
     const matchFilter = filter === 'semua' || it.status === filter;
+    const matchPeriod = isInDateRange(it.tanggalTransaksi, dateRange);
     const matchSearch = !q ||
       it.nomorTransaksi.toLowerCase().includes(q) ||
       (it.customerName ?? '').toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+    return matchFilter && matchPeriod && matchSearch;
   });
 
   function openMenu(e: React.MouseEvent<HTMLElement>, item: Transaksi) {
@@ -54,10 +57,12 @@ export default function TransaksiList({ items, loading, onAdd, onCancel }: Props
   return (
     <Box>
       <Box sx={{ bgcolor: 'var(--color-canvas)', border: '1px solid var(--color-hairline)', borderRadius: 'var(--rounded-md)', mb: 2, overflow: 'hidden' }}>
-        <Box sx={{ px: 2, pt: 2 }}>
-          <TextField placeholder="Cari nomor transaksi, pelanggan..." value={search} onChange={(e) => setSearch(e.target.value)} size="small" fullWidth
-            slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'var(--color-ash)' }} /></InputAdornment> } }}
-            sx={{ mb: 1.5 }} />
+        <Box sx={{ px: 2, pt: 2, pb: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+            <TextField placeholder="Cari nomor transaksi, pelanggan..." value={search} onChange={(e) => setSearch(e.target.value)} size="small" fullWidth
+              slotProps={{ input: { startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'var(--color-ash)' }} /></InputAdornment> } }} />
+            <DateRangeFilter value={dateRange} onChange={setDateRange} />
+          </Box>
         </Box>
         <Tabs value={filter} onChange={(_, v) => setFilter(v as Filter)}
           sx={{ px: 2, minHeight: 40, '& .MuiTab-root': { minHeight: 40, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'none' }, '& .Mui-selected': { color: 'var(--color-primary)' }, '& .MuiTabs-indicator': { bgcolor: 'var(--color-primary)' } }}>

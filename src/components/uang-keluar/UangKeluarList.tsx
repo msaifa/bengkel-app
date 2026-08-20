@@ -12,6 +12,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { UangKeluar, KATEGORI_PENGELUARAN } from '@/types/uangKeluar';
 import { formatCurrency, formatDate } from '@/utils/format';
 import EmptyState from '@/components/common/EmptyState';
+import DateRangeFilter, { DateRange, isInDateRange, todayString } from '@/components/common/DateRangeFilter';
 import UangKeluarStatusChip from './UangKeluarStatusChip';
 
 interface Props {
@@ -27,12 +28,14 @@ export default function UangKeluarList({ items, loading, onAdd }: Props) {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<FilterStatus>('semua');
   const [filterKategori, setFilterKategori] = useState('semua');
+  const [dateRange, setDateRange] = useState<DateRange>({ start: todayString(), end: todayString() });
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
     return items.filter((it) => {
       if (filterStatus !== 'semua' && it.status !== filterStatus) return false;
       if (filterKategori !== 'semua' && it.kategori !== filterKategori) return false;
+      if (!isInDateRange(it.tanggalPengeluaran, dateRange)) return false;
       if (q) {
         return (
           it.nomorPengeluaran.toLowerCase().includes(q) ||
@@ -44,7 +47,7 @@ export default function UangKeluarList({ items, loading, onAdd }: Props) {
       }
       return true;
     });
-  }, [items, search, filterStatus, filterKategori]);
+  }, [items, search, filterStatus, filterKategori, dateRange]);
 
   const totalPosted = useMemo(
     () => filtered.filter((it) => it.status === 'posted').reduce((s, it) => s + it.nominal, 0),
@@ -73,46 +76,51 @@ export default function UangKeluarList({ items, loading, onAdd }: Props) {
   return (
     <Box>
       {/* Filters */}
-      <Box sx={{ display: 'flex', gap: 1.5, mb: 2, flexWrap: 'wrap', alignItems: 'center' }}>
-        <TextField
-          size="small"
-          placeholder="Cari nomor, kategori, keterangan..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{ flex: 1, minWidth: 200 }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18, color: 'var(--color-mute)' }} />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
-        <TextField
-          size="small"
-          select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
-          sx={{ minWidth: 130 }}
-        >
-          <MenuItem value="semua">Semua Status</MenuItem>
-          <MenuItem value="posted">Tercatat</MenuItem>
-          <MenuItem value="cancelled">Dibatalkan</MenuItem>
-        </TextField>
-        <TextField
-          size="small"
-          select
-          value={filterKategori}
-          onChange={(e) => setFilterKategori(e.target.value)}
-          sx={{ minWidth: 150 }}
-        >
-          <MenuItem value="semua">Semua Kategori</MenuItem>
-          {KATEGORI_PENGELUARAN.map((k) => (
-            <MenuItem key={k} value={k}>{k}</MenuItem>
-          ))}
-        </TextField>
+      <Box sx={{ bgcolor: 'var(--color-canvas)', border: '1px solid var(--color-hairline)', borderRadius: 'var(--rounded-md)', p: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 1.5 }}>
+          <TextField
+            size="small"
+            placeholder="Cari nomor, kategori, keterangan..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            fullWidth
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 18, color: 'var(--color-mute)' }} />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+        </Box>
+        <Box sx={{ display: 'flex', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
+          <TextField
+            size="small"
+            select
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value as FilterStatus)}
+            sx={{ minWidth: 130 }}
+          >
+            <MenuItem value="semua">Semua Status</MenuItem>
+            <MenuItem value="posted">Tercatat</MenuItem>
+            <MenuItem value="cancelled">Dibatalkan</MenuItem>
+          </TextField>
+          <TextField
+            size="small"
+            select
+            value={filterKategori}
+            onChange={(e) => setFilterKategori(e.target.value)}
+            sx={{ minWidth: 150 }}
+          >
+            <MenuItem value="semua">Semua Kategori</MenuItem>
+            {KATEGORI_PENGELUARAN.map((k) => (
+              <MenuItem key={k} value={k}>{k}</MenuItem>
+            ))}
+          </TextField>
+        </Box>
       </Box>
 
       {/* Summary */}

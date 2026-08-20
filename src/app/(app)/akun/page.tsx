@@ -16,7 +16,6 @@ import {
 import InventoryIcon from '@mui/icons-material/Inventory';
 import BuildIcon from '@mui/icons-material/Build';
 import CategoryIcon from '@mui/icons-material/Category';
-import PaymentsIcon from '@mui/icons-material/Payments';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -28,7 +27,6 @@ const iconMap: Record<string, React.ReactNode> = {
   '/master/barang': <InventoryIcon fontSize="small" />,
   '/master/jasa':   <BuildIcon fontSize="small" />,
   '/master/paket':  <CategoryIcon fontSize="small" />,
-  '/uang-keluar':   <PaymentsIcon fontSize="small" />,
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
