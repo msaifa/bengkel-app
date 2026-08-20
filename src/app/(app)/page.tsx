@@ -6,6 +6,7 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { useDashboardStats, DashboardPeriod } from '@/hooks/useDashboardStats';
 import { formatCurrency } from '@/utils/format';
 import QuickTransaksi from '@/components/dashboard/QuickTransaksi';
+import DashboardChart from '@/components/dashboard/DashboardChart';
 
 // ─── Period labels ────────────────────────────────────────────────────────────
 const PERIOD_OPTIONS: { value: DashboardPeriod; label: string }[] = [
@@ -267,7 +268,7 @@ function PeriodCard({ period, setPeriod, laba, loading }: PeriodCardProps) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const { loading, period, setPeriod, stats } = useDashboardStats();
+  const { loading, period, setPeriod, stats, chartData } = useDashboardStats();
 
   return (
     <Box>
@@ -312,6 +313,11 @@ export default function DashboardPage() {
       {/* Quick Transaksi */}
       <Box sx={{ mt: 3 }}>
         <QuickTransaksi />
+      </Box>
+
+      {/* Chart */}
+      <Box sx={{ mt: 2 }}>
+        <DashboardChart chartData={chartData} period={period} loading={loading} />
       </Box>
     </Box>
   );

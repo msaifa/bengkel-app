@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/utils/format';
 import { Jasa } from '@/types/master';
 import { TransactionItem } from '@/types/transaksi';
+import StokAlert from '@/components/dashboard/StokAlert';
 
 // ─── Quick item definition ────────────────────────────────────────────────────
 
@@ -324,6 +325,11 @@ export default function QuickTransaksi() {
         >
           Pengeluaran
         </Button>
+      </Box>
+
+      {/* ── Stok alert ────────────────────────────────────────────────────── */}
+      <Box sx={{ mt: 2 }}>
+        <StokAlert />
       </Box>
 
       {/* ── Confirm dialog ────────────────────────────────────────────────── */}
