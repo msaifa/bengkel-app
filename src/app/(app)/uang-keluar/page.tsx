@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Box, Fab } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { UangKeluar, UangKeluarFormData } from '@/types/uangKeluar';
@@ -12,6 +13,7 @@ import AppSnackbar, { SnackbarState, SNACKBAR_CLOSED, snackError, snackSuccess }
 
 export default function UangKeluarPage() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
   const [items, setItems] = useState<UangKeluar[]>([]);
   const [loading, setLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
@@ -33,6 +35,16 @@ export default function UangKeluarPage() {
     load();
     return () => { cancelled = true; };
   }, []);
+
+  // Auto-open form when navigated with ?tambah=1
+  useEffect(() => {
+    async function checkParam() {
+      if (searchParams.get('tambah') === '1') {
+        setFormOpen(true);
+      }
+    }
+    checkParam();
+  }, [searchParams]);
 
   async function handleSubmit(data: UangKeluarFormData) {
     if (!user) return;

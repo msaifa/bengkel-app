@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Box, Toolbar } from '@mui/material';
+import MobileBottomNavigation, { BOTTOM_NAV_HEIGHT } from './MobileBottomNavigation';
 import AppHeader from './AppHeader';
 import AppSidebar from './AppSidebar';
-import MobileBottomNavigation, { BOTTOM_NAV_HEIGHT } from './MobileBottomNavigation';
 
 const DRAWER_WIDTH = 248;
 
