@@ -61,8 +61,8 @@ const QUICK_ITEMS: QuickItem[] = [
   },
   {
     id: 'tambal-1',
-    label: 'Tambal Biasa',
-    jasaKeyword: 'tambal biasa',
+    label: 'Tambal Bocor',
+    jasaKeyword: 'tambal ban bocor',
     qty: 1,
     icon: <BuildCircleIcon />,
     color: '#f59e0b',
@@ -71,7 +71,7 @@ const QUICK_ITEMS: QuickItem[] = [
   {
     id: 'tambal-2',
     label: 'Tambal Tubles',
-    jasaKeyword: 'tambal tubles',
+    jasaKeyword: 'tambal ban tubles',
     qty: 1,
     icon: <BuildCircleIcon />,
     color: '#ef4444',
