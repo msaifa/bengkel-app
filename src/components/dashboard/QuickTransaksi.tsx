@@ -306,7 +306,7 @@ export default function QuickTransaksi() {
           fullWidth
           variant="contained"
           startIcon={<PaymentsIcon />}
-          onClick={() => router.push('/uang-keluar?tambah=1')}
+          onClick={() => router.push('/keuangan?tambah=1')}
           sx={{
             bgcolor: '#7f1d1d',
             color: 'rgba(255,255,255,0.92)',

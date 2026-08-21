@@ -17,11 +17,11 @@ export interface MobileNavItem {
 }
 
 export const mobilePrimaryNav = [
-  { label: 'Dashboard',    href: '/' },
-  { label: 'Pembelian',    href: '/barang-masuk' },
-  { label: 'Transaksi',    href: '/transaksi' },
-  { label: 'Pengeluaran',  href: '/uang-keluar' },
-  { label: 'Akun',         href: '/akun' },
+  { label: 'Dashboard',   href: '/' },
+  { label: 'Pembelian',   href: '/barang-masuk' },
+  { label: 'Transaksi',   href: '/transaksi' },
+  { label: 'Keuangan',    href: '/keuangan' },
+  { label: 'Akun',        href: '/akun' },
 ] as const;
 
 // ─── Account / Secondary Navigation ─────────────────────────────────────────
@@ -59,7 +59,7 @@ export function getBottomNavValue(pathname: string): number {
   if (pathname === '/') return 0;
   if (pathname.startsWith('/barang-masuk') || pathname.startsWith('/stok')) return 1;
   if (pathname.startsWith('/transaksi')) return 2;
-  if (pathname.startsWith('/uang-keluar')) return 3;
+  if (pathname.startsWith('/keuangan') || pathname.startsWith('/uang-keluar')) return 3;
   if (isAkunActive(pathname)) return 4;
   return -1;
 }

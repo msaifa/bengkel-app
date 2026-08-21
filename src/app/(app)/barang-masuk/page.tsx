@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Box, Fab, Tab, Tabs } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import InventoryIcon from '@mui/icons-material/Inventory';
+import HistoryIcon from '@mui/icons-material/History';
 import { Pembelian, InventoryView, StockMovement } from '@/types/pembelian';
 import { fetchAllPembelian } from '@/services/pembelian.service';
 import { fetchInventoryView, fetchRecentMovements } from '@/services/inventory.service';
@@ -91,11 +94,11 @@ export default function BarangMasukPage() {
       <Tabs
         value={tab}
         onChange={(_, v) => setTab(v as ActiveTab)}
-        sx={{ mb: 3, minHeight: 40, '& .MuiTab-root': { minHeight: 40, fontSize: '0.875rem', fontWeight: 600, textTransform: 'none' }, '& .Mui-selected': { color: 'var(--color-primary)' }, '& .MuiTabs-indicator': { bgcolor: 'var(--color-primary)' } }}
+        sx={{ mb: 3, minHeight: 40, '& .MuiTab-root': { minHeight: 40, fontSize: '0.875rem', fontWeight: 600, textTransform: 'none', gap: 0.75 }, '& .Mui-selected': { color: 'var(--color-primary)' }, '& .MuiTabs-indicator': { bgcolor: 'var(--color-primary)' } }}
       >
-        <Tab label="Pembelian" value="pembelian" />
-        <Tab label="Stok Saat Ini" value="stok" />
-        <Tab label="Riwayat Pergerakan" value="riwayat" />
+        <Tab icon={<ShoppingCartIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Pembelian" value="pembelian" />
+        <Tab icon={<InventoryIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Stok Saat Ini" value="stok" />
+        <Tab icon={<HistoryIcon sx={{ fontSize: 18 }} />} iconPosition="start" label="Riwayat" value="riwayat" />
       </Tabs>
 
       {tab === 'pembelian' && (

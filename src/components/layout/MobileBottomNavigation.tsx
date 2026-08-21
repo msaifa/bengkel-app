@@ -16,11 +16,11 @@ import { getBottomNavValue } from '@/config/navigation';
 
 // ─── Nav items — exactly 5 ───────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/',             icon: <HomeIcon /> },
-  { label: 'Pembelian', href: '/barang-masuk', icon: <ShoppingCartIcon /> },
-  { label: 'Transaksi', href: '/transaksi',    icon: <ReceiptLongIcon /> },
-  { label: 'Pengeluaran', href: '/uang-keluar', icon: <PaymentsIcon /> },
-  { label: 'Akun',      href: '/akun',         icon: <PersonIcon /> },
+  { label: 'Dashboard',  href: '/',             icon: <HomeIcon /> },
+  { label: 'Pembelian',  href: '/barang-masuk', icon: <ShoppingCartIcon /> },
+  { label: 'Transaksi',  href: '/transaksi',    icon: <ReceiptLongIcon /> },
+  { label: 'Keuangan',   href: '/keuangan',     icon: <PaymentsIcon /> },
+  { label: 'Akun',       href: '/akun',         icon: <PersonIcon /> },
 ] as const;
 
 // Height of the floating bar itself (px) — used for bottom padding in AppShell
