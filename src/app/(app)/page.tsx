@@ -114,17 +114,16 @@ function StatCard({ label, value, subvalue, blobColor, icon, valueColor, loading
   );
 }
 
-// ─── Period + Laba Card (dark hero card) ─────────────────────────────────────
+// ─── Period + Omzet Card (dark hero card) ────────────────────────────────────
 interface PeriodCardProps {
   period: DashboardPeriod;
   setPeriod: (p: DashboardPeriod) => void;
-  laba: number;
+  omzet: number;
   loading: boolean;
 }
 
-function PeriodCard({ period, setPeriod, laba, loading }: PeriodCardProps) {
-  const isPositive = laba >= 0;
-  const labaColor = isPositive ? '#4ade80' : '#f87171';
+function PeriodCard({ period, setPeriod, omzet, loading }: PeriodCardProps) {
+  const omzetColor = '#4ade80';
 
   return (
     <Box
@@ -213,10 +212,10 @@ function PeriodCard({ period, setPeriod, laba, loading }: PeriodCardProps) {
           mb: 0.75,
         }}
       >
-        Laba
+        Omzet
       </Typography>
 
-      {/* Laba value */}
+      {/* Omzet value */}
       {loading ? (
         <Skeleton
           width="60%"
@@ -229,15 +228,15 @@ function PeriodCard({ period, setPeriod, laba, loading }: PeriodCardProps) {
             fontSize: '1.75rem',
             fontWeight: 800,
             lineHeight: 1.1,
-            color: labaColor,
+            color: omzetColor,
             letterSpacing: '-0.02em',
           }}
         >
-          {formatCurrency(laba)}
+          {formatCurrency(omzet)}
         </Typography>
       )}
 
-      {/* Surplus / Defisit badge */}
+      {/* Omzet badge */}
       {!loading && (
         <Box
           sx={{
@@ -246,19 +245,19 @@ function PeriodCard({ period, setPeriod, laba, loading }: PeriodCardProps) {
             px: 1,
             py: 0.25,
             borderRadius: '6px',
-            bgcolor: isPositive ? 'rgba(74,222,128,0.15)' : 'rgba(248,113,113,0.15)',
-            border: `1px solid ${isPositive ? 'rgba(74,222,128,0.30)' : 'rgba(248,113,113,0.30)'}`,
+            bgcolor: 'rgba(74,222,128,0.15)',
+            border: '1px solid rgba(74,222,128,0.30)',
           }}
         >
           <Typography
             sx={{
               fontSize: '0.6875rem',
               fontWeight: 700,
-              color: labaColor,
+              color: omzetColor,
               letterSpacing: '0.04em',
             }}
           >
-            {isPositive ? '▲ Surplus' : '▼ Defisit'}
+            ▲ Total Pendapatan
           </Typography>
         </Box>
       )}
@@ -274,12 +273,12 @@ export default function DashboardPage() {
     <Box>
 
       <Grid container spacing={2}>
-        {/* Laba + Period card — full width on mobile, half on md+ */}
+        {/* Omzet + Period card — full width on mobile, half on md+ */}
         <Grid size={{ xs: 12, md: 6 }}>
           <PeriodCard
             period={period}
             setPeriod={setPeriod}
-            laba={stats.laba}
+            omzet={stats.omzet}
             loading={loading}
           />
         </Grid>

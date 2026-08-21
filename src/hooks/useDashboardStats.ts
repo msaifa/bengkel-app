@@ -11,15 +11,15 @@ export type DashboardPeriod = 'hari-ini' | 'bulan-ini' | 'tahun-ini';
 export interface DashboardStats {
   uangMasuk: number;
   uangKeluar: number;
-  laba: number;
+  omzet: number;
   jumlahTransaksi: number;
 }
 
 export interface ChartPoint {
-  label: string;   // e.g. "Sen", "01 Agu", "Jan"
+  label: string;
   masuk: number;
   keluar: number;
-  laba: number;
+  omzet: number;
 }
 
 // ─── Period helpers ───────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ function calcStats(
   return {
     uangMasuk,
     uangKeluar,
-    laba: uangMasuk - uangKeluar,
+    omzet: uangMasuk,
     jumlahTransaksi: postedTransaksi.length,
   };
 }
@@ -102,7 +102,7 @@ function buildChartData(
         label: DAY_LABELS[day.getDay()],
         masuk,
         keluar,
-        laba: masuk - keluar,
+        omzet: masuk,
       };
     });
   }
@@ -121,7 +121,7 @@ function buildChartData(
         label: `${dd} ${mm}`,
         masuk,
         keluar,
-        laba: masuk - keluar,
+        omzet: masuk,
       };
     });
   }
@@ -139,7 +139,7 @@ function buildChartData(
       label: MONTH_LABELS[targetMonth],
       masuk,
       keluar,
-      laba: masuk - keluar,
+      omzet: masuk,
     };
   });
 }
@@ -158,7 +158,7 @@ export interface UseDashboardStatsResult {
 const EMPTY_STATS: DashboardStats = {
   uangMasuk: 0,
   uangKeluar: 0,
-  laba: 0,
+  omzet: 0,
   jumlahTransaksi: 0,
 };
 

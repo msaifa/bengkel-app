@@ -50,7 +50,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const nameMap: Record<string, string> = {
     masuk: 'Uang Masuk',
     keluar: 'Uang Keluar',
-    laba: 'Laba',
+    omzet: 'Omzet',
   };
 
   return (
@@ -144,7 +144,7 @@ export default function DashboardChart({ chartData, period, loading }: Dashboard
         {[
           { key: 'masuk',  label: 'Uang Masuk',  color: '#60a5fa' },
           { key: 'keluar', label: 'Uang Keluar', color: '#f87171' },
-          { key: 'laba',   label: 'Laba',         color: '#4ade80' },
+          { key: 'omzet',  label: 'Omzet',        color: '#4ade80' },
         ].map((item) => (
           <Box key={item.key} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
             <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: item.color }} />
@@ -226,7 +226,7 @@ export default function DashboardChart({ chartData, period, loading }: Dashboard
             />
             <Area
               type="monotone"
-              dataKey="laba"
+              dataKey="omzet"
               stroke="#4ade80"
               strokeWidth={2}
               fill="url(#gradLaba)"
